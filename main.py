@@ -11,15 +11,9 @@ from app.facade import Loggers
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    from app.facade.database import init_tortoise_orm, autoMigrate
-    # 初始化Tortoise ORM
-    init_tortoise_orm(app)
     # 接管默认日志
     Loggers.init_config()
-    # 自动迁移
-    autoMigrate()
     yield
-
 
 app = FastAPI(lifespan=lifespan)
 
@@ -33,6 +27,9 @@ add_routers(app)
 
 if __name__ == "__main__":
     initConfig()
+    from app.facade.database import init_tortoise_orm, autoMigrate
+    # 初始化Tortoise ORM
+    init_tortoise_orm(app)
     config = toml.load('config/app.toml')
     port = config.get('app').get('port', 3030)
     uvicorn.run("main:app", host="0.0.0.0", port=port,

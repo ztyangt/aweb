@@ -1,5 +1,6 @@
 import toml
 import os
+import shutil
 import subprocess
 from tortoise.contrib.fastapi import register_tortoise
 
@@ -48,9 +49,11 @@ def init_tortoise_orm(app):
 
 def autoMigrate():
     runtime_path = 'runtime/migrations'
+    if os.path.exists(runtime_path):
+        shutil.rmtree(runtime_path)
     subprocess.run(['aerich', 'init', '-t',
                    'app.facade.database.config', '--location', f'{runtime_path}'])
-    if (not os.path.exists(f'{runtime_path}/models')):
-        subprocess.run(['aerich', 'init-db'])
+
+    subprocess.run(['aerich', 'init-db'])
     subprocess.run(['aerich', 'migrate'])
     subprocess.run(['aerich', 'upgrade'])
