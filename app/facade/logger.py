@@ -45,7 +45,7 @@ class Logger:
         self.add_logfile("ERROR")
         self.add_logfile("CRITICAL")
 
-        self.logger.add(sys.stdout, format=self.LOG_FORMAT)
+        # self.logger.add(sys.stdout, format=self.LOG_FORMAT)
 
         LOGGER_NAMES = ("uvicorn.asgi", "uvicorn.access", "uvicorn")
 

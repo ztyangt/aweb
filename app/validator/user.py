@@ -4,11 +4,19 @@ from typing import List, Optional
 
 
 class UserVal(BaseModel):
-    id: Optional[int] = Field(None,  example=1, description="用户id,存在更新,不存在则新增")
-    name: str = Field(example="张三", description="用户名字")
-    age: Optional[int] = Field(None,  example=99, description="用户年龄")
-    password: str = Field(description="用户密码")
+    # id: Optional[int] = Field(None,  example=1, description="用户id,存在更新,不存在则新增")
+    account: str = Field(description="用户账号")
+    nickname: str = Field(example="张三", description="用户名字")
+    avatar: str = Field(None, description="用户头像")
+    gender: int = Field(0, description="用户性别")
     email: Optional[str] = Field(None, description="电子邮件")
+    password: str = Field(description="用户密码")
+
+    @validator("gender")
+    def gender_validator(cls, v):
+        if v not in [0, 1, 2]:
+            raise ValueError("性别参数只能为0,1,2")
+        return v
 
     @validator("password")
     def password_validator(cls, v):

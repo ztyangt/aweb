@@ -1,8 +1,4 @@
 import toml
-import os
-import shutil
-import subprocess
-from tortoise.contrib.fastapi import register_tortoise
 
 
 db_config = toml.load('config/database.toml')
@@ -31,29 +27,6 @@ config = {
         }
     },
 
-    "use_tz": False,
+    "use_tz": True,
     "timezone": "Asia/Shanghai",
 }
-
-
-def init_tortoise_orm(app):
-
-    # 注册Tortoise ORM到FastAPI应用
-    register_tortoise(
-        app=app,
-        config=config,
-        # generate_schemas=False,  # 自动生成数据库表结构
-        # add_exception_handlers=True,  # 添加异常处理,生产环境建议关闭，会泄露调试信息
-    )
-
-
-def autoMigrate():
-    runtime_path = 'runtime/migrations'
-    if os.path.exists(runtime_path):
-        shutil.rmtree(runtime_path)
-    subprocess.run(['aerich', 'init', '-t',
-                   'app.facade.database.config', '--location', f'{runtime_path}'])
-
-    subprocess.run(['aerich', 'init-db'])
-    subprocess.run(['aerich', 'migrate'])
-    subprocess.run(['aerich', 'upgrade'])

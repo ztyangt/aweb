@@ -1,22 +1,17 @@
 import toml
 import uvicorn
 from fastapi import FastAPI
-from fastapi.exceptions import RequestValidationError
-from contextlib import asynccontextmanager
 from app.facade.config import initConfig
-from app.facade.exception import validation_exception_handler
 from app.facade.routes import add_routers
 from app.facade import Loggers
+from app.facade.database import config
+from tortoise.contrib.fastapi import register_tortoise
+from fastapi.exceptions import RequestValidationError
+from app.facade.exception import validation_exception_handler
 
+app = FastAPI()
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # 接管默认日志
-    Loggers.init_config()
-    yield
-
-app = FastAPI(lifespan=lifespan)
-
+register_tortoise(app=app, config=config)
 
 # 参数异常处理
 app.add_exception_handler(RequestValidationError,
@@ -27,10 +22,7 @@ add_routers(app)
 
 if __name__ == "__main__":
     initConfig()
-    from app.facade.database import init_tortoise_orm, autoMigrate
-    # 初始化Tortoise ORM
-    init_tortoise_orm(app)
+    Loggers.init_config()
     config = toml.load('config/app.toml')
     port = config.get('app').get('port', 3030)
-    uvicorn.run("main:app", host="0.0.0.0", port=port,
-                reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
