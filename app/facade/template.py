@@ -22,3 +22,15 @@ database = \"\"
 password = \"\"
 # 数据库编码
 charset = \"utf8mb4\""""
+
+
+TempJwt = """# JWT配置
+[jwt]
+# 密钥
+key      = \"Aweb-7dfa9589ccf3b93336fd22af3c77061e\"
+# 过期时间(秒)
+expire   = \"7 * 24 * 60 * 60\"
+# 签发者
+issuer   = \"ztyang\"
+# 主题
+subject  = \"Aweb\""""

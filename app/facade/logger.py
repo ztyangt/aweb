@@ -45,15 +45,15 @@ class Logger:
         self.add_logfile("ERROR")
         self.add_logfile("CRITICAL")
 
-        # self.logger.add(sys.stdout, format=self.LOG_FORMAT)
+        self.logger.add(sys.stdout, format=self.LOG_FORMAT)
 
-        LOGGER_NAMES = ("uvicorn.asgi", "uvicorn.access", "uvicorn")
+        # LOGGER_NAMES = ("uvicorn.asgi", "uvicorn.access", "uvicorn")
 
         # change handler for default uvicorn logger
-        logging.getLogger().handlers = [InterceptHandler()]
-        for logger_name in LOGGER_NAMES:
-            logging_logger = logging.getLogger(logger_name)
-            logging_logger.handlers = [InterceptHandler()]
+        # logging.getLogger().handlers = [InterceptHandler()]
+        # for logger_name in LOGGER_NAMES:
+        #     logging_logger = logging.getLogger(logger_name)
+        #     logging_logger.handlers = [InterceptHandler()]
 
     def add_logfile(self, level):
         filename = f'{level.lower()}/{datetime.now().strftime("%Y-%m-%d")}.log'
