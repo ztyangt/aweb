@@ -1,1 +1,2 @@
-from .list import ListUtils as list
+from .list import ListUtil as list
+from .password import PasswordUtil as password

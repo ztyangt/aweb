@@ -11,7 +11,7 @@ class UserModel(BaseModel):
     email = fields.CharField(
         max_length=32, description="邮箱", unique=True, null=True)
     gender = fields.IntField(default=0, description="性别")
-    password = fields.CharField(max_length=32, description="密码")
+    password = fields.CharField(max_length=60, description="密码")
 
     # 公共字段
     expand = fields.JSONField(null=True, description="扩展数据")
@@ -24,6 +24,12 @@ class UserModel(BaseModel):
     class Meta:
         table = "users"
 
+    def result(self) -> dict:
+        return {}
 
-User_Pydantic = pydantic_model_creator(
-    UserModel, name="User", model_config={"from_attributes": True})
+    class PydanticMeta:
+        computed = ["result"]
+        exclude = ["password"]
+
+
+User_Pydantic = pydantic_model_creator(UserModel, name="User")
