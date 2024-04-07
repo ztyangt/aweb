@@ -16,5 +16,7 @@ class UseTimeMiddleware(BaseHTTPMiddleware):
         # 调用下一个中间件或路由处理函数
         result = await call_next(request)
         process_time = time.time() - start_time
-        result.headers["X-Process-Time"] = str(process_time)
+        process_time_ms = round(process_time * 1000, 2)
+        # 将处理时间添加到响应头中
+        result.headers["X-Process-Time"] = f"{process_time_ms}ms"
         return result
