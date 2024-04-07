@@ -1,20 +1,20 @@
 from itertools import groupby
 
 
-class ListUtils:
+class ListUtil:
 
-    """
-    过滤掉连续的重复项和空字符串
-
-    Args:
-        array (list): 待过滤的数组。
-
-    Returns:
-        list: 过滤后的新数组。
-
-    """
     @staticmethod
     def filter(array):
+        """
+        过滤掉连续的重复项和空字符串
+
+        Args:
+            array (list): 待过滤的数组。
+
+        Returns:
+            list: 过滤后的新数组。
+
+        """
         filtered = [item for item in array if item and item != '']
         sorted_filtered = sorted(filtered)
         deduplicated = [k for k, _ in groupby(sorted_filtered)]
