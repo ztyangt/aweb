@@ -9,6 +9,7 @@ class initConfig:
             os.mkdir('config')
         self.initAppConfig()
         self.initDbConfig()
+        self.initJwtConfig()
 
     def initAppConfig(self):
         # 初始化配置文件，如果存在则跳过
@@ -24,3 +25,11 @@ class initConfig:
         if not os.path.exists(config_file):
             with open(config_file, 'w') as f:
                 f.write(TempDatabase)
+
+    def initJwtConfig(self):
+        # 初始化配置文件，如果存在则跳过
+        config_file = 'config/jwt.toml'
+
+        if not os.path.exists(config_file):
+            with open(config_file, 'w') as f:
+                f.write(TempJwt)

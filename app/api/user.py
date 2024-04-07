@@ -6,7 +6,6 @@ from app.validator.user import UserVal
 from app.facade import RES
 from app.model.user import UserModel, User_Pydantic
 from app.facade.exception import handle_api_exceptions
-from loguru import logger
 
 
 user = APIRouter()
@@ -18,7 +17,6 @@ async def one(
     id: int = Query(description="数据id"),
     fields: List[str] = Query(default=None, description="查询字段"),
 ):
-    logger.info('启动服务')
     res = await UserModel.get_or_none(id=id)
     if res is None:
         return RES.res_200(code=204, msg='无数据')

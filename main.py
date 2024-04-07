@@ -11,6 +11,9 @@ from app.middleware import registerMiddlewareHandle
 
 app = FastAPI(title="Aweb")
 
+# 初始化配置
+initConfig()
+
 # 注册全局中间件
 registerMiddlewareHandle(app)
 
@@ -30,7 +33,6 @@ async def startup_event():
 
 
 if __name__ == "__main__":
-    initConfig()
     config = toml.load('config/app.toml')
     port = config.get('app').get('port', 3030)
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

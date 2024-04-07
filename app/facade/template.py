@@ -33,4 +33,8 @@ expire   = \"7 * 24 * 60 * 60\"
 # 签发者
 issuer   = \"ztyang\"
 # 主题
-subject  = \"Aweb\""""
+subject  = \"Aweb\"
+# 算法
+algorithm = \"HS256\"
+# 时区
+timezone = \"Asia/Shanghai\""""
