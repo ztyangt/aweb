@@ -5,12 +5,20 @@ from typing import List, Optional
 
 class UserVal(BaseModel):
     # id: Optional[int] = Field(None,  example=1, description="用户id,存在更新,不存在则新增")
-    account: str = Field(description="用户账号")
+    username: str = Field(description="用户名")
     nickname: str = Field(example="张三", description="用户名字")
     avatar: str = Field(None, description="用户头像")
     gender: int = Field(0, description="用户性别")
     email: Optional[str] = Field(None, description="电子邮件")
     password: str = Field(description="用户密码")
+
+    @validator("username")
+    def username_validator(cls, v: str):
+        if len(v) > 32:
+            raise ValueError("用户名长度不能超过32")
+        if not v.encode().isalnum():
+            raise ValueError("用户名只能包含字母和数字")
+        return v
 
     @validator("gender")
     def gender_validator(cls, v):

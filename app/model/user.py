@@ -5,7 +5,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 
 class UserModel(BaseModel):
     id = fields.IntField(pk=True)
-    account = fields.CharField(max_length=32, description="账号", unique=True)
+    username = fields.CharField(max_length=32, description="账号", unique=True)
     nickname = fields.CharField(max_length=32, description="用户名")
     avatar = fields.CharField(max_length=128, description="头像", null=True)
     email = fields.CharField(

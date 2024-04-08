@@ -32,14 +32,9 @@ def handle_api_exceptions(func):
 
 async def http_exception_handler(request, exc: HTTPException):
     """自定义处理HTTPException"""
-    if exc.status_code == status.HTTP_404_NOT_FOUND:
-        # 处理404错误
-        return RES.res_200(code=404, msg="接口路由不存在！")
-    elif exc.status_code == status.HTTP_405_METHOD_NOT_ALLOWED:
-        # 处理405错误
-        return RES.res_200(code=404, msg="请求方式错误！")
-    else:
-        return RES.res_200(code=400, msg="未知错误！")
+
+    log.error(exc.detail)
+    return RES.res_200(code=exc.status_code, msg=exc.detail)
 
 
 async def app_exception_handler(request: Request, exc: Exception):

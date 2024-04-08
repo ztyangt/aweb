@@ -1,11 +1,11 @@
-import utils
 import math
 from typing import List
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends, Request
 from app.validator.user import UserVal
 from app.facade import RES
 from app.model.user import UserModel, User_Pydantic
 from app.facade.exception import handle_api_exceptions
+from app.facade.encry import handleAuth, JwtUtil
 
 
 user = APIRouter()
@@ -55,18 +55,18 @@ async def column(
     return RES.res_200([item.model_dump(mode="json", include=fields) for item in res]) if len(res) else RES.res_200(code=204, msg='无数据')
 
 
-@user.post("/create", summary="创建用户")
+@user.post("/create", summary="创建用户", dependencies=[Depends(JwtUtil.check_token)])
 @handle_api_exceptions
 async def create(data: UserVal):
-    existing_account = await UserModel.get_or_none(account=data.account)
+    existing_username = await UserModel.get_or_none(username=data.username)
 
-    if existing_account:
+    if existing_username:
         return RES.res_200(code=400, msg='账号已存在')
     existing_email = None if data.email == None else await UserModel.get_or_none(email=data.email)
     if existing_email:
         return RES.res_200(code=400, msg='邮箱已存在')
 
-    data.password = utils.password.create(data.password)
+    data.password = handleAuth.get_password_hash(data.password)
 
     res = await UserModel.create(**data.model_dump())
     return RES.res_200({"id": res.id}, 200, '创建成功')
