@@ -1,7 +1,7 @@
 import math
 from typing import List
-from fastapi import APIRouter, Query, Depends, Request
-from app.validator.user import UserVal
+from fastapi import APIRouter, Query, Depends, Body, Header
+from app.validator.user import UserVal, UserUpdateVal
 from app.facade import RES
 from app.model.user import UserModel, User_Pydantic
 from app.facade.exception import handle_api_exceptions
@@ -48,16 +48,21 @@ async def count():
 
 @user.get("/column", summary="查询列")
 @handle_api_exceptions
-async def column(
-    fields: List[str] = Query(default=None, description="查询字段"),
-):
+async def column(fields: List[str] = Query(default=None, description="查询字段")):
     res = await User_Pydantic.from_queryset(UserModel.all())
     return RES.res_200([item.model_dump(mode="json", include=fields) for item in res]) if len(res) else RES.res_200(code=204, msg='无数据')
 
 
+@user.put("/update", summary="更新用户", dependencies=[Depends(JwtUtil.check_token)])
+@handle_api_exceptions
+async def update(data: UserUpdateVal):
+    await UserModel.filter(id=data.id).update(**data.model_dump())
+    return RES.res_200({"id": "id"}, code=200, msg='更新成功')
+
+
 @user.post("/create", summary="创建用户", dependencies=[Depends(JwtUtil.check_token)])
 @handle_api_exceptions
-async def create(data: UserVal):
+async def create(data: UserVal, Authorization: str = Header(description="token")):
     existing_username = await UserModel.get_or_none(username=data.username)
 
     if existing_username:
