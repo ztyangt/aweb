@@ -8,10 +8,10 @@ class UserModel(BaseModel):
     account = fields.CharField(max_length=32, description="账号", unique=True)
     nickname = fields.CharField(max_length=32, description="用户名")
     avatar = fields.CharField(max_length=128, description="头像", null=True)
-    email = fields.CharField(
-        max_length=32, description="邮箱", unique=True, null=True)
+    email = fields.CharField(max_length=32, description="邮箱", unique=True, null=True)
     gender = fields.IntField(default=0, description="性别")
     password = fields.CharField(max_length=60, description="密码")
+    admin = fields.BooleanField(null=True, default=False, description="管理员")
 
     # 公共字段
     expand = fields.JSONField(null=True, description="扩展数据")
@@ -29,7 +29,7 @@ class UserModel(BaseModel):
 
     class PydanticMeta:
         computed = ["result"]
-        exclude = ["password"]
+        exclude = ["password", "admin"]
 
 
 User_Pydantic = pydantic_model_creator(UserModel, name="User")

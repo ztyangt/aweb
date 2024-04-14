@@ -2,7 +2,6 @@ import traceback
 from app.facade import log
 from app.facade import RES
 from functools import wraps
-from fastapi import status
 from fastapi.requests import Request
 from starlette.exceptions import HTTPException
 
@@ -10,11 +9,13 @@ from starlette.exceptions import HTTPException
 async def validation_exception_handler(request, exc):
     errors = []
     for error in exc.errors():
-        errors.append({
-            'loc': error.get('loc'),
-            'msg': error.get('msg'),
-            'type': error.get('type')
-        })
+        errors.append(
+            {
+                "loc": error.get("loc"),
+                "msg": error.get("msg"),
+                "type": error.get("type"),
+            }
+        )
         log.error(f"参数错误: {str(errors)}")
     return RES.res_400(errors, "参数错误")
 
@@ -27,6 +28,7 @@ def handle_api_exceptions(func):
         except Exception as e:
             log.error(f"接口异常: {e}")
             return RES.res_400(str(e))
+
     return wrapper
 
 

@@ -1,7 +1,8 @@
 import math
 import time
 from typing import List
-from fastapi import APIRouter, Query, Depends, Body, Header
+from fastapi import APIRouter, Query, Depends, Body
+from app.types.common.jwt import JwtData
 from app.validator.base.user import UserVal, UserUpdateVal
 from app.facade import RES
 from app.model.base.user import UserModel, User_Pydantic
@@ -115,7 +116,7 @@ async def column(
     )
 
 
-@user.post("/save", summary="保存用户", dependencies=[Depends(JwtUtil.check_token)])
+@user.post("/save", summary="保存用户", dependencies=[Depends(JwtUtil.check_login)])
 @handle_api_exceptions
 async def save(data: UserUpdateVal):
     if data.id:
@@ -125,7 +126,7 @@ async def save(data: UserUpdateVal):
         return await create(data)
 
 
-@user.post("/create", summary="创建用户", dependencies=[Depends(JwtUtil.check_token)])
+@user.post("/create", summary="创建用户", dependencies=[Depends(JwtUtil.check_admin)])
 @handle_api_exceptions
 async def create(data: UserVal):
     existing_account = await UserModel.exists(account=data.account)
@@ -144,9 +145,12 @@ async def create(data: UserVal):
     return RES.res_200({"id": res.id}, 200, "创建成功")
 
 
-@user.put("/update", summary="更新用户", dependencies=[Depends(JwtUtil.check_token)])
+@user.put("/update", summary="更新用户")
 @handle_api_exceptions
-async def update(data: UserUpdateVal):
+async def update(data: UserUpdateVal, cur_user: JwtData = Depends(JwtUtil.check_login)):
+    if not (cur_user["uid"] == data.id or cur_user.get("admin", False)):
+        return RES.res_200(code=403, msg="无权限")
+    print(cur_user)
     exist = await UserModel.exists(id=data.id)
     if not exist:
         return RES.res_200(code=400, msg="用户不存在")
@@ -160,7 +164,7 @@ async def update(data: UserUpdateVal):
     return RES.res_200({"id": id}, code=200, msg="更新成功")
 
 
-@user.put("/restore", summary="恢复数据", dependencies=[Depends(JwtUtil.check_token)])
+@user.put("/restore", summary="恢复数据", dependencies=[Depends(JwtUtil.check_admin)])
 @handle_api_exceptions
 async def restore(ids: List[int] = Body(description="主键列表")):
     records_to_restore = await UserModel.filter(
@@ -177,9 +181,15 @@ async def restore(ids: List[int] = Body(description="主键列表")):
     return RES.res_200({"ids": restore_ids}, code=200, msg="操作成功")
 
 
-@user.delete("/remove", summary="软删除", dependencies=[Depends(JwtUtil.check_token)])
+@user.delete("/remove", summary="软删除")
 @handle_api_exceptions
-async def remove(ids: List[int] = Body(description="主键列表")):
+async def remove(
+    ids: List[int] = Body(description="主键列表"),
+    cur_user: JwtData = Depends(JwtUtil.check_admin),
+):
+    if cur_user["uid"] in ids:
+        return RES.res_200({"id": cur_user["uid"]}, code=400, msg="不能自己删除自己！")
+
     # 获取要更新的记录的完整列表（包括ID）
     records_to_update = await UserModel.filter(id__in=ids, delete_time__isnull=True)
 
@@ -194,9 +204,15 @@ async def remove(ids: List[int] = Body(description="主键列表")):
     return RES.res_200({"ids": updated_ids}, code=200, msg="操作成功")
 
 
-@user.delete("/delete", summary="彻底删除", dependencies=[Depends(JwtUtil.check_token)])
+@user.delete("/delete", summary="彻底删除")
 @handle_api_exceptions
-async def delete(ids: List[int] = Body(description="主键列表")):
+async def delete(
+    ids: List[int] = Body(description="主键列表"),
+    cur_user: JwtData = Depends(JwtUtil.check_admin),
+):
+    if cur_user["uid"] in ids:
+        return RES.res_200({"id": cur_user["uid"]}, code=400, msg="不能自己删除自己！")
+
     records_to_delete = await UserModel.filter(id__in=ids, delete_time__not_isnull=True)
 
     if not records_to_delete:
@@ -208,7 +224,7 @@ async def delete(ids: List[int] = Body(description="主键列表")):
 
 
 @user.delete(
-    "/clear", summary="清空回收站", dependencies=[Depends(JwtUtil.check_token)]
+    "/clear", summary="清空回收站", dependencies=[Depends(JwtUtil.check_login)]
 )
 @handle_api_exceptions
 async def clear():
