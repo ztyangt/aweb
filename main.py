@@ -2,14 +2,21 @@ import toml
 import uvicorn
 from fastapi import FastAPI
 from app.facade import Loggers, registerCustomErrorHandle
-from app.facade.database import config
+from app.facade.database import config, InsertUtil
 from app.facade.config import initConfig
 from app.facade.routes import add_routers
 from tortoise.contrib.fastapi import register_tortoise
 from app.middleware import registerMiddlewareHandle
 
 
-app = FastAPI(title="Aweb")
+# @asynccontextmanager
+# async def lifespan(app: FastAPI):
+#     Loggers.init_config()
+#     await InsertUtil.init_data()
+#     yield
+#     print("关闭应用")
+
+app = FastAPI(title="Poetry-API", version="0.1")
 
 # 初始化配置
 initConfig()
@@ -30,6 +37,7 @@ register_tortoise(app=app, config=config)
 @app.on_event("startup")
 async def startup_event():
     Loggers.init_config()
+    await InsertUtil.init_data()
 
 
 if __name__ == "__main__":

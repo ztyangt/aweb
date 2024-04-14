@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query
 from typing import Optional
-from app.validator.test import TestVal
+from app.validator.base.test import TestVal
 
 test = APIRouter()
 

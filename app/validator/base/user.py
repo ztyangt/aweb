@@ -5,19 +5,19 @@ from typing import List, Optional
 
 class UserVal(BaseModel):
     # id: Optional[int] = Field(None,  example=1, description="用户id,存在更新,不存在则新增")
-    username: str = Field(description="用户名")
+    account: str = Field(description="账号")
     nickname: str = Field(example="张三", description="用户名字")
     password: str = Field(description="用户密码")
     gender: int = Field(0, description="用户性别")
     avatar: str = Field(None, description="用户头像")
     email: str = Field(None, description="电子邮件")
 
-    @validator("username")
-    def username_validator(cls, v: str):
+    @validator("account")
+    def account_validator(cls, v: str):
         if len(v) > 32:
-            raise ValueError("用户名长度不能超过32")
+            raise ValueError("账号长度不能超过32")
         if not v.encode().isalnum():
-            raise ValueError("用户名只能包含字母和数字")
+            raise ValueError("账号只能包含字母和数字")
         return v
 
     @validator("gender")
@@ -40,20 +40,20 @@ class UserVal(BaseModel):
 
 
 class UserUpdateVal(BaseModel):
-    id: int = Field(example=1, description="用户id,存在更新,不存在则新增")
-    username: str = Field(None, description="用户名")
-    nickname: str = Field(None, example="张三", description="用户名字")
+    id: int = Field(None, example=1, description="用户id,存在更新,不存在则新增")
+    account: str = Field(None, description="账号")
+    nickname: str = Field(None, example="张三", description="用户昵称")
     password: str = Field(None, description="用户密码")
     gender: int = Field(None, description="用户性别")
     avatar: str = Field(None, description="用户头像")
     email: str = Field(None, description="电子邮件")
 
-    @validator("username")
-    def username_validator(cls, v: str):
+    @validator("account")
+    def account_validator(cls, v: str):
         if len(v) > 32:
-            raise ValueError("用户名长度不能超过32")
+            raise ValueError("账号长度不能超过32")
         if not v.encode().isalnum():
-            raise ValueError("用户名只能包含字母和数字")
+            raise ValueError("账号只能包含字母和数字")
         return v
 
     @validator("gender")

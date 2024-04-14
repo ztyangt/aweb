@@ -1,4 +1,7 @@
 import toml
+from app.model.base.config import ConfigModel
+from app.model.base.user import UserModel
+from app.facade.encry import handleAuth
 
 
 db_config = toml.load('config/database.toml')
@@ -22,7 +25,7 @@ config = {
 
     "apps": {
         "models": {
-            "models": ["app.model.user", "aerich.models"],
+            "models": ["app.model.base.user", "app.model.base.config", "aerich.models"],
             "default_connection": "default",
         }
     },
@@ -30,3 +33,17 @@ config = {
     "use_tz": True,
     "timezone": "Asia/Shanghai",
 }
+
+
+class InsertUtil:
+
+    @staticmethod
+    async def init_data():
+        await InsertUtil.insert_admin_user()
+
+    @staticmethod
+    async def insert_admin_user():
+        count = await UserModel.all().count()
+        if 0 == count:
+            password = handleAuth.get_password_hash("@Zty9575964")
+            await UserModel.create(account="admin", password=password, nickname="管理员")

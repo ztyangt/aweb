@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import Any
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from app.model.user import UserModel
+from app.model.base.user import UserModel
 from fastapi import Request, HTTPException, status
 
 
@@ -81,8 +81,8 @@ class handleAuth:
         return pwd_context.hash(password)
 
     @staticmethod
-    async def authenticate_user(username: str, password: str):
-        user = await UserModel.get_or_none(username=username)
+    async def authenticate_user(account: str, password: str):
+        user = await UserModel.get_or_none(account=account)
         if not user:
             return False
         if not handleAuth.verify_password(password, user.password):
