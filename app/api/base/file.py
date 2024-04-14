@@ -1,16 +1,22 @@
 import os
 from datetime import datetime
-from fastapi import APIRouter, File, UploadFile, Form
-from typing import List, Optional
+from fastapi import APIRouter, UploadFile, Form, Depends
 from uuid import uuid4
+from app.facade.encry import JwtUtil
+
+
 file = APIRouter()
 
 
-@file.post("/upload", summary="文件上传")
-def upload(file: UploadFile, name: str = Form(None, description="文件名"), path: str = Form(None, description="文件上传路径")):
+@file.post("/upload", summary="文件上传", dependencies=[Depends(JwtUtil.check_login)])
+def upload(
+    file: UploadFile,
+    name: str = Form(None, description="文件名"),
+    path: str = Form(None, description="文件上传路径"),
+):
     try:
         base_dir = "public/storage/upload"
-        now = datetime.now().strftime('%Y-%m-%d')
+        now = datetime.now().strftime("%Y-%m-%d")
         dir_path = os.path.join(base_dir, now)
 
         if name:
